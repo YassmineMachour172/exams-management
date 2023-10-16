@@ -52,7 +52,6 @@ const Register=()=> {
                 // Show an alert or perform any other actions
                 setMsgModal("Welcome dear friend")
                  handleShow()
-                // Route to another page using history
                 navigate('/');
               }, 2000); // 1000ms = 1 second
            
