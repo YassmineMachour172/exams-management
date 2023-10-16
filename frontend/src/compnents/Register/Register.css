@@ -1,0 +1,12 @@
+body{
+    background-color: #99BADD;
+    margin-left: 30%;
+    align-items: center;
+}
+
+.error-msg {
+    color: red; 
+}
+.msg-modal,.msg-modal-title{
+    color: black;
+}
