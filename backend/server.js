@@ -129,24 +129,46 @@ app.post("/Register",function(req,res){
     
 
   }if(status === 'Lecturer'){
-    //insert into lecturer table
-    const LecturerData = {
-      idL: req?.body?.id,
-      firstName: req?.body?.firstName,
-      lastName: req?.body?.lastName,
-      password:req?.body?.password
-    };
-    const insertQuery = 'INSERT INTO Lecturer (idL, firstName, lastName,password) VALUES (?, ?, ?,?)';
+    status='Lecturer';
+    const selectQuery = 'SELECT * FROM Lecturer WHERE idS = ?';
+    connection.query(selectQuery, [ req?.body?.id], (err, results) => {
+      if (err) {
+        console.error('Error retrieving Lecturer:', err);
+        res.send({success:false,error:err,info:null})
+      }
+      if (results.length === 0) {
+        //insert
+        const lecturerData = {
+          idL: req?.body?.id,
+          firstName: req?.body?.firstName,
+          lastName: req?.body?.lastName,
+          password:req?.body?.password
+        };
+        const insertQuery = 'INSERT INTO Lecturer (idL, firstName, lastName,password) VALUES (?, ?, ?,?)';
 
-const lecturer=connection.query(insertQuery, [LecturerData.idL, LecturerData.firstName, LecturerData.lastName,LecturerData.password], (err, results) => {
-  if (err) {
-    console.error('Error inserting data:', err);
-    return;
-  }
-  console.log('Data inserted successfully\n');
-  console.log(lecturer,'!!!!!!!!!');
-});
-    console.log("lecturer table!!!!!!!!!!!!");
+        const user=connection.query(insertQuery, [lecturerData.idL, lecturerData.firstName, lecturerData.lastName,lecturerData.password], (err, results) => {
+          if (err) {
+            console.error('Error inserting data:', err);
+            res.send({success:false,error:err,info:null})
+          }
+          console.log('Data inserted successfully\n');
+          const result = {
+            idL: req?.body?.id,
+              firstName: req?.body?.firstName,
+              lastName: req?.body?.lastName,
+              password:req?.body?.password,
+            status:'Lecturer'
+          };
+          res.send({success:true,error:null,info:{result}})
+        });
+            console.log("Lecturer table!!!!!!!!!!!!");
+        
+      } else {
+        const lecturer = results[0]; // Assuming the query returns a single lecturer
+        //send that he is already exists
+        res.send({success:false,error:"already EXIST",info:{lecturer}})
+      }
+    });
 
   }
 })
