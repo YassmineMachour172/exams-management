@@ -84,7 +84,7 @@ console.log('Table StudentLecturer created successfully');
 app.post("/Register",function(req,res){
   console.log(req.body);
   let status=req.body.Status
-  if(status===''||status === 'Student'){
+  if(status === 'Student'){
     status='Student';
     const selectQuery = 'SELECT * FROM student WHERE idS = ?';
     connection.query(selectQuery, [ req?.body?.id], (err, results) => {

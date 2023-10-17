@@ -9,7 +9,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 const Register=()=> {
-    const [Status, setStatus] = useState("");
+    const [Status, setStatus] = useState("Student");
     const [showModal, setShow] = useState(false);/*define state for the modal box */
     const [msgModal, setMsgModal] = useState('');/*define state for the message modal box */
     const navigate=useNavigate();
@@ -91,7 +91,7 @@ return (
         <div className="row">
             
         <select value={Status} onChange={handleChange}>
-        <option value="Student">Sudent</option>
+        <option value="Student">Student</option>
         <option value="Lecturer">Lecturer</option>
         </select>
             
