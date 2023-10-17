@@ -19,22 +19,22 @@ app.use(cors());
 const connection = mysql.createConnection({
     host: 'localhost', // MySQL server host
     user: 'root',
-    password:'&Yassmine172',
-    port:'3306',
-    database:'exams',
-  });
-  
-  // Establish the connection
-  connection.connect((err) => {
+    password: '123456',
+    port: '3306',
+    database: 'exams',
+});
+
+// Establish the connection
+connection.connect((err) => {
     if (err) {
-      console.error('Error connecting to MySQL:', err);
-      return;
+        console.error('Error connecting to MySQL:', err);
+        return;
     }
     console.log('Connected to MySQL');
-  });
-  
-  // Perform database operations here
-  const createTableQuery = `
+});
+
+// Perform database operations here
+const createTableQuery = `
   CREATE TABLE IF NOT EXISTS LECTURER (
     idL   varchar(9)  PRIMARY KEY,
     firstName VARCHAR(255) NOT NULL,
@@ -43,11 +43,11 @@ const connection = mysql.createConnection({
 `;
 
 connection.query(createTableQuery, (err, results) => {
-  if (err) {
-    console.error('Error creating table:', err);
-    return;
-  }
-  console.log('Table created successfully');
+    if (err) {
+        console.error('Error creating table:', err);
+        return;
+    }
+    console.log('Table created successfully');
 });
 const createTableQuery1 = `
 CREATE TABLE IF NOT EXISTS Student (
@@ -58,11 +58,11 @@ CREATE TABLE IF NOT EXISTS Student (
 `;
 
 connection.query(createTableQuery1, (err, results) => {
-if (err) {
-  console.error('Error creating table:', err);
-  return;
-}
-console.log('Table Student created successfully');
+    if (err) {
+        console.error('Error creating table:', err);
+        return;
+    }
+    console.log('Table Student created successfully');
 });
 const createTableQuery2 = `
 CREATE TABLE IF NOT EXISTS StudentLecturer (
@@ -72,166 +72,168 @@ CREATE TABLE IF NOT EXISTS StudentLecturer (
 `;
 
 connection.query(createTableQuery2, (err, results) => {
-if (err) {
-  console.error('Error creating table:', err);
-  return;
-}
-console.log('Table StudentLecturer created successfully');
+    if (err) {
+        console.error('Error creating table:', err);
+        return;
+    }
+    console.log('Table StudentLecturer created successfully');
 });
 
 
 //Register management
-app.post("/Register",function(req,res){
-  console.log(req.body);
-  let status=req.body.Status
-  if(status === 'Student'){
-    status='Student';
-    const selectQuery = 'SELECT * FROM student WHERE idS = ?';
-    connection.query(selectQuery, [ req?.body?.id], (err, results) => {
-      if (err) {
-        console.error('Error retrieving student:', err);
-        res.send({success:false,error:err,info:null})
-      }
-      if (results.length === 0) {
-        //insert
-        const studentData = {
-          idS: req?.body?.id,
-          firstName: req?.body?.firstName,
-          lastName: req?.body?.lastName,
-          password:req?.body?.password
-        };
-        const insertQuery = 'INSERT INTO Student (idS, firstName, lastName,password) VALUES (?, ?, ?,?)';
+app.post("/Register", function(req, res) {
+    console.log(req.body);
+    let status = req.body.Status
+    if (status === 'Student') {
+        status = 'Student';
+        const selectQuery = 'SELECT * FROM student WHERE idS = ?';
+        const id = req.body.id
+        connection.query(selectQuery, [id], (err, results) => {
+            if (err) {
+                console.error('Error retrieving student:', err);
+                res.send({ success: false, error: err, info: null })
+            }
+            if (results.length === 0) {
+                //insert
+                const studentData = {
+                    idS: req.body.id,
+                    firstName: req.body.firstName,
+                    lastName: req.body.lastName,
+                    password: req.body.password
+                };
+                const insertQuery = 'INSERT INTO Student (idS, firstName, lastName,password) VALUES (?, ?, ?,?)';
 
-        const user=connection.query(insertQuery, [studentData.idS, studentData.firstName, studentData.lastName,studentData.password], (err, results) => {
-          if (err) {
-            console.error('Error inserting data:', err);
-            res.send({success:false,error:err,info:null})
-          }
-          console.log('Data inserted successfully\n');
-          const result = {
-            idS: req?.body?.id,
-              firstName: req?.body?.firstName,
-              lastName: req?.body?.lastName,
-              password:req?.body?.password,
-            status:'Student'
-          };
-          res.send({success:true,error:null,info:{result}})
+                const user = connection.query(insertQuery, [studentData.idS, studentData.firstName, studentData.lastName, studentData.password], (err, results) => {
+                    if (err) {
+                        console.error('Error inserting data:', err);
+                        res.send({ success: false, error: err, info: null })
+                    }
+                    console.log('Data inserted successfully\n');
+                    const result = {
+                        idS: req.body.id,
+                        firstName: req.body.firstName,
+                        lastName: req.body.lastName,
+                        password: req.body.password,
+                        status: 'Student'
+                    };
+                    res.send({ success: true, error: null, info: { result } })
+                });
+                console.log("student table!!!!!!!!!!!!");
+
+            } else {
+                const student = results[0]; // Assuming the query returns a single student
+                //send that he is already exists
+                res.send({ success: false, error: "already EXIST", info: { student } })
+            }
         });
-            console.log("student table!!!!!!!!!!!!");
-        
-      } else {
-        const student = results[0]; // Assuming the query returns a single student
-        //send that he is already exists
-        res.send({success:false,error:"already EXIST",info:{student}})
-      }
-    });
 
-    
 
-  }if(status === 'Lecturer'){
-    status='Lecturer';
-    const selectQuery = 'SELECT * FROM Lecturer WHERE idS = ?';
-    connection.query(selectQuery, [ req?.body?.id], (err, results) => {
-      if (err) {
-        console.error('Error retrieving Lecturer:', err);
-        res.send({success:false,error:err,info:null})
-      }
-      if (results.length === 0) {
-        //insert
-        const lecturerData = {
-          idL: req?.body?.id,
-          firstName: req?.body?.firstName,
-          lastName: req?.body?.lastName,
-          password:req?.body?.password
-        };
-        const insertQuery = 'INSERT INTO Lecturer (idL, firstName, lastName,password) VALUES (?, ?, ?,?)';
 
-        const user=connection.query(insertQuery, [lecturerData.idL, lecturerData.firstName, lecturerData.lastName,lecturerData.password], (err, results) => {
-          if (err) {
-            console.error('Error inserting data:', err);
-            res.send({success:false,error:err,info:null})
-          }
-          console.log('Data inserted successfully\n');
-          const result = {
-            idL: req?.body?.id,
-              firstName: req?.body?.firstName,
-              lastName: req?.body?.lastName,
-              password:req?.body?.password,
-            status:'Lecturer'
-          };
-          res.send({success:true,error:null,info:{result}})
+    }
+    if (status === 'Lecturer') {
+        status = 'Lecturer';
+        const selectQuery = 'SELECT * FROM Lecturer WHERE idS = ?';
+        connection.query(selectQuery, [req.body.id], (err, results) => {
+            if (err) {
+                console.error('Error retrieving Lecturer:', err);
+                res.send({ success: false, error: err, info: null })
+            }
+            if (results.length === 0) {
+                //insert
+                const lecturerData = {
+                    idL: req.body.id,
+                    firstName: req.body.firstName,
+                    lastName: req.body.lastName,
+                    password: req.body.password
+                };
+                const insertQuery = 'INSERT INTO Lecturer (idL, firstName, lastName,password) VALUES (?, ?, ?,?)';
+
+                const user = connection.query(insertQuery, [lecturerData.idL, lecturerData.firstName, lecturerData.lastName, lecturerData.password], (err, results) => {
+                    if (err) {
+                        console.error('Error inserting data:', err);
+                        res.send({ success: false, error: err, info: null })
+                    }
+                    console.log('Data inserted successfully\n');
+                    const result = {
+                        idL: req.body.id,
+                        firstName: req.body.firstName,
+                        lastName: req.body.lastName,
+                        password: req.body.password,
+                        status: 'Lecturer'
+                    };
+                    res.send({ success: true, error: null, info: { result } })
+                });
+                console.log("Lecturer table!!!!!!!!!!!!");
+
+            } else {
+                const lecturer = results[0]; // Assuming the query returns a single lecturer
+                //send that he is already exists
+                res.send({ success: false, error: "already EXIST", info: { lecturer } })
+            }
         });
-            console.log("Lecturer table!!!!!!!!!!!!");
-        
-      } else {
-        const lecturer = results[0]; // Assuming the query returns a single lecturer
-        //send that he is already exists
-        res.send({success:false,error:"already EXIST",info:{lecturer}})
-      }
-    });
 
-  }
+    }
 })
 
 //log in
-app.post("/SignIn", function (req, res) {
-  console.log("Server");
-  console.log(req.body);
-  let status = "";
-  let data = {};
+app.post("/SignIn", function(req, res) {
+    console.log("Server");
+    console.log(req.body);
+    let status = "";
+    let data = {};
 
-  // Check if it's a student
-  const selectQuery = 'SELECT * FROM Student WHERE idS = ? ';
-  connection.query(selectQuery, [req?.body?.id], (err, results) => {
-    if (err) {
-      console.error('Error retrieving Student:', err);
-      res.send({ success: false, error: err, info: null });
-    } else if (results.length === 1) {
-      status = "Student";
-      const idS = results[0].idS;
-      const firstName = results[0].firstName;
-      const lastName = results[0].lastName;
-      if (results[0].password === req?.body?.password) {
-        data = {
-          idS,
-          firstName,
-          lastName,
-          status,
-        };
-        res.send({ success: true, error: null, info: data });
-      } else {
-        res.send({ success: false, error: "incorrect password", info: null });
-      }
-    } else {
-      // If it's not a student, check if it's a lecturer
-      const selectQuery1 = 'SELECT * FROM Lecturer WHERE idL = ? ';
-      connection.query(selectQuery1, [req?.body?.id], (err, results) => {
+    // Check if it's a student
+    const selectQuery = 'SELECT * FROM Student WHERE idS = ? ';
+    connection.query(selectQuery, [req.body.id], (err, results) => {
         if (err) {
-          console.error('Error retrieving Lecturer:', err);
-          res.send({ success: false, error: err, info: null });
+            console.error('Error retrieving Student:', err);
+            res.send({ success: false, error: err, info: null });
         } else if (results.length === 1) {
-          status = "Lecturer";
-          const idL = results[0].idL;
-          const firstName = results[0].firstName;
-          const lastName = results[0].lastName;
-          if (results[0].password === req?.body?.password) {
-            data = {
-              idL,
-              firstName,
-              lastName,
-              status,
-            };
-            res.send({ success: true, error: null, info: data });
-          } else {
-            res.send({ success: false, error: "incorrect password", info: null });
-          }
+            status = "Student";
+            const idS = results[0].idS;
+            const firstName = results[0].firstName;
+            const lastName = results[0].lastName;
+            if (results[0].password === req.body.password) {
+                data = {
+                    idS,
+                    firstName,
+                    lastName,
+                    status,
+                };
+                res.send({ success: true, error: null, info: data });
+            } else {
+                res.send({ success: false, error: "incorrect password", info: null });
+            }
         } else {
-          // If it's neither student nor lecturer, return an error
-          res.send({ success: false, error: "User not found", info: null });
+            // If it's not a student, check if it's a lecturer
+            const selectQuery1 = 'SELECT * FROM Lecturer WHERE idL = ? ';
+            connection.query(selectQuery1, [req.body.id], (err, results) => {
+                if (err) {
+                    console.error('Error retrieving Lecturer:', err);
+                    res.send({ success: false, error: err, info: null });
+                } else if (results.length === 1) {
+                    status = "Lecturer";
+                    const idL = results[0].idL;
+                    const firstName = results[0].firstName;
+                    const lastName = results[0].lastName;
+                    if (results[0].password === req.body.password) {
+                        data = {
+                            idL,
+                            firstName,
+                            lastName,
+                            status,
+                        };
+                        res.send({ success: true, error: null, info: data });
+                    } else {
+                        res.send({ success: false, error: "incorrect password", info: null });
+                    }
+                } else {
+                    // If it's neither student nor lecturer, return an error
+                    res.send({ success: false, error: "User not found", info: null });
+                }
+            });
         }
-      });
-    }
-  });
+    });
 });
 
 
