@@ -4,7 +4,6 @@ const axios = require("axios");
 var path = require("path");
 const bodyParser = require("body-parser"); //parse request parameters
 const mysql = require('mysql2');
-const { stat } = require("fs");
 
 const app = express(); // Create express app
 const port = process.env.PORT || 8000; // Port to listen on
@@ -26,6 +25,7 @@ const connection = mysql.createConnection({
 
 // Establish the connection
 connection.connect((err) => {
+
     if (err) {
         console.error('Error connecting to MySQL:', err);
         return;
