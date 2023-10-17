@@ -4,7 +4,6 @@ const axios = require("axios");
 var path = require("path");
 const bodyParser = require("body-parser"); //parse request parameters
 const mysql = require('mysql2');
-const { stat } = require("fs");
 
 const app = express(); // Create express app
 const port = process.env.PORT || 8000; // Port to listen on
