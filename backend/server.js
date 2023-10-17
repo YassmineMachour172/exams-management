@@ -173,6 +173,66 @@ app.post("/Register",function(req,res){
   }
 })
 
+//log in
+app.post("/SignIn", function (req, res) {
+  console.log("Server");
+  console.log(req.body);
+  let status = "";
+  let data = {};
+
+  // Check if it's a student
+  const selectQuery = 'SELECT * FROM Student WHERE idS = ? ';
+  connection.query(selectQuery, [req?.body?.id], (err, results) => {
+    if (err) {
+      console.error('Error retrieving Student:', err);
+      res.send({ success: false, error: err, info: null });
+    } else if (results.length === 1) {
+      status = "Student";
+      const idS = results[0].idS;
+      const firstName = results[0].firstName;
+      const lastName = results[0].lastName;
+      if (results[0].password === req?.body?.password) {
+        data = {
+          idS,
+          firstName,
+          lastName,
+          status,
+        };
+        res.send({ success: true, error: null, info: data });
+      } else {
+        res.send({ success: false, error: "incorrect password", info: null });
+      }
+    } else {
+      // If it's not a student, check if it's a lecturer
+      const selectQuery1 = 'SELECT * FROM Lecturer WHERE idL = ? ';
+      connection.query(selectQuery1, [req?.body?.id], (err, results) => {
+        if (err) {
+          console.error('Error retrieving Lecturer:', err);
+          res.send({ success: false, error: err, info: null });
+        } else if (results.length === 1) {
+          status = "Lecturer";
+          const idL = results[0].idL;
+          const firstName = results[0].firstName;
+          const lastName = results[0].lastName;
+          if (results[0].password === req?.body?.password) {
+            data = {
+              idL,
+              firstName,
+              lastName,
+              status,
+            };
+            res.send({ success: true, error: null, info: data });
+          } else {
+            res.send({ success: false, error: "incorrect password", info: null });
+          }
+        } else {
+          // If it's neither student nor lecturer, return an error
+          res.send({ success: false, error: "User not found", info: null });
+        }
+      });
+    }
+  });
+});
 
 
 

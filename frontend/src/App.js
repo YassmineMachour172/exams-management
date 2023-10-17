@@ -9,6 +9,7 @@ import Statistics from './compnents/Statistics/Statistics';
 import CreateExam from './compnents/CreateExam/CreateExam';
 import OpenQuestion from './compnents/OpenQuestion/OpenQuestion';
 import MultipleQ from './compnents/MultipleQ/MultipleQ';
+import MainStudent from './compnents/MainStudent/MainStudent';
 function App() {
   return (
     <div id='App'>
@@ -23,6 +24,7 @@ function App() {
               <Route path="/CreateExam" element={<CreateExam/>} />
               <Route path="/OpenQuestion" element={<OpenQuestion/>} />
               <Route path="/MultipleQ" element={<MultipleQ/>} />
+              <Route path="/MainStudent" element={<MainStudent/>} />
 
 
 

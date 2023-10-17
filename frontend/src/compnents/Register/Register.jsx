@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState , useRef } from 'react';
 import { useNavigate  } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
@@ -29,12 +29,13 @@ const Register=()=> {
         //resolver: yupResolver(logInSchema), /* validate the form with the schema */
         mode: "onChange" /* validate the form on change */
     });
-    const signUpForm = document.querySelector('#sign-up-form'); 
+
+    const signUpFormRef = useRef(null);
     const submitForm = async ( e) => {
-    const id = signUpForm.querySelector('#id').value;
-    const password = signUpForm.querySelector('#password').value;
-    const lastName = signUpForm.querySelector('#lastName').value;
-    const firstName = signUpForm.querySelector('#firstName').value;
+    const id = signUpFormRef.current.querySelector('#id').value;
+    const password = signUpFormRef.current.querySelector('#password').value;
+    const lastName = signUpFormRef.current.querySelector('#lastName').value;
+    const firstName = signUpFormRef.current.querySelector('#firstName').value;
     console.log(id,password,firstName,lastName,Status);
     try{
         console.log("before request");
@@ -70,7 +71,7 @@ return (
     <div className="container-fluid">
         <center>
     <div className="row"><h1>Sign Up</h1></div>
-    <form action="POST" id='sign-up-form' onSubmit={handleSubmit(submitForm)}>
+    <form action="POST" id='sign-up-form' ref={signUpFormRef} onSubmit={handleSubmit(submitForm)}>
         <div className="row">
             
                 <input type='text' placeholder='First Name....' id='firstName'{...register('firstName')}/>
