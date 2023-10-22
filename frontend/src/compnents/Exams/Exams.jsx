@@ -1,17 +1,65 @@
 import React, {  useEffect, useState } from 'react';
 import { useNavigate  } from 'react-router-dom';
+import ReactTable from '../ReactTable/ReactTable';
+import axios from 'axios';
 
  const Exams=() =>{
     const navigate=useNavigate();
-    const [dataa,setData]=useState({
-        name:  "yassmine",
-        id:"123",
-        examDate:"12/05/2023",
-        startH:"12:00",
-        totalTime: "123",
-        randomQ: "yes",
-        randomA:"yes"
-    })
+    const [TableData, setTableData] = useState([]);
+ 
+    useEffect(() => {
+        const idL = localStorage.getItem('idL').replace(/"/g, '');
+        const fetchData = async () => {
+          console.log("before");
+          try {
+            const response = await axios.get(`http://localhost:8000/Exams?idL=${idL}`);
+            console.log("after", response.data.info);
+            if (response.data.success === true) {
+              setTableData(response.data.info); // Wrap examsData in an array to match your component's expected data format
+            } else {
+              console.log(response.data.error);
+            }
+          } catch (error) {
+            console.error("catch ", error);
+          }
+        };
+    
+        fetchData();
+      }, []);
+      const [searchInput, setSearchInput] = useState("");
+    const tableColumns = React.useMemo(
+        () => [
+          {
+            Header: 'name',
+            accessor: 'name',
+          },
+          {
+            Header: 'examId',
+            accessor: 'examId',
+          },
+          {
+            Header: 'examDate',
+            accessor: 'examDate',
+          },
+          {
+            Header: 'startH',
+            accessor: 'startH',
+          },
+          {
+            Header: 'totalTime',
+            accessor: 'totalTime',
+          },
+          {
+            Header: 'randomQ',
+            accessor: 'randomQ',
+          },
+          {
+            Header: 'randomA',
+            accessor: 'randomA',
+          }
+        ],
+        []
+      );
     const handleClickCreateExam = () => {
        /* console.log('Edit button clicked for car with treatment number: ', row.original.treatmentNumber);
         localStorage.setItem('carService', JSON.stringify(row.original)); /* save the car service data that choose to edit in local storage */
@@ -31,72 +79,25 @@ import { useNavigate  } from 'react-router-dom';
        window.location.reload(false) /* reload the page after delete car service*/
     }
 
-    const data = [
-        {
-            name:  "yassmine",
-            id:"123",
-            examDate:"12/05/2023",
-            startH:"12:00",
-            totalTime: "123",
-            randomQ: "yes",
-            randomA:"yes"
-        },
-        {
-            name:  "yassmine",
-            id:"123",
-            examDate:"12/05/2023",
-            startH:"12:00",
-            totalTime: "123",
-            randomQ: "yes",
-            randomA:"yes"
-        },
-        {
-            name:  "yassmine",
-            id:"123",
-            examDate:"12/05/2023",
-            startH:"12:00",
-            totalTime: "123",
-            randomQ: "yes",
-            randomA:"yes"
-        },
-        {
-            name:  "yassmine",
-            id:"123",
-            examDate:"12/05/2023",
-            startH:"12:00",
-            totalTime: "123",
-            randomQ: "yes",
-            randomA:"yes"
-        }
-    ]
+
   return (
     <div  className="container-fluid">
         <h1>Exams</h1>
-     <br/>
-     <br/>
-    <button onClick={handleClickCreateExam}>create exam</button><br/>
-     <input type='text' placeholder='exam name...'/><button onClick={handleClickSearch}>Search</button>
-      <center> <table className='table4' Style="color:Black;text-align: center;">
-                <tr Style="color: #D66850;">
-               
-                    
-                    
-                </tr>
-                {data.map((val, key) => {
-                    return (
-                        <tr key={key}>
-                            <td>{val.name}</td>
-                            <td>{val.id}</td>
-                            <td>{val.examDate}</td>
-                            <td>{val.startH}</td>
-                            <td>{val.totalTime}</td>
-                            <td>{val.randomQ}</td>
-                            <td>{val.randomA}</td>
-                                                 
-                        </tr>
-                    )
-                })}
-            </table></center> 
+   
+
+      <div>
+        <center> 
+          <h1>table </h1>   <br/>
+      <br/>
+      <button onClick={handleClickCreateExam}>create exam</button>
+      <br/>
+          <div className="table-responsive">
+            <table className="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+              <ReactTable columns={tableColumns} data={TableData} />
+            </table>
+          </div>
+        </center>
+      </div>
     </div>
   )
 }

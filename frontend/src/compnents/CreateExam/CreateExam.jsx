@@ -1,18 +1,32 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState , useRef} from 'react';
 import {useNavigate} from 'react-router-dom'
 import { useForm } from 'react-hook-form';
+import axios from 'axios';
+import { Modal, Button } from "react-bootstrap";
+
 
  const CreateExam=()=> {
     const navigate=useNavigate();
-    const [isRandomA, setRandomA] = useState(false);
-    const [isRandomQ, setRandomQ] = useState(false);
-    const handleRandomQ = () => {
-        setRandomQ(!isRandomQ);
-        console.log(isRandomQ)
+    const [randomA, setrandomA] = useState(false);
+    const [randomQ, setrandomQ] = useState(false);
+    const [showModal, setShow] = useState(false);/*define state for the modal box */
+    const [msgModal, setMsgModal] = useState('');/*define state for the message modal box */
+    /* function that close the modal and reset the message modal*/
+    const handleClose = () =>{
+      setShow(false);
+      setMsgModal('');
+ }
+ /* function that open the modal and displays it*/
+ const handleShow = () =>{
+     setShow(true);
+ }
+    const handlerandomQ = () => {
+        setrandomQ(!randomQ);
+        console.log(randomQ)
       };
-      const handleRandomA = () => {
-        setRandomA(!isRandomA );
-        console.log(isRandomA)
+      const handlerandomA = () => {
+        setrandomA(!randomA );
+        console.log(randomA)
       };
     const handleClickMultipule=()=>{
         navigate('/MultipleQ')
@@ -24,27 +38,42 @@ import { useForm } from 'react-hook-form';
         //resolver: yupResolver(logInSchema), /* validate the form with the schema */
         mode: "onChange" /* validate the form on change */
     });
-
-    const examForm = document.querySelector('#exam-form'); 
+    const CreateExamFormRef= useRef(null);
     const submitForm = async ( e) => {
-    const name = examForm.querySelector('#name').value;
-    const id = examForm.querySelector('#id').value;
-    const examDate = examForm.querySelector('#examDate').value;
-    const startH = examForm.querySelector('#startH').value;
-    const totalTime = examForm.querySelector('#totalTime').value;
-   console.log(name,id,examDate,startH,totalTime,isRandomA,isRandomQ)
+      const idL=localStorage.getItem('idL').replace(/"/g, '');
+    const name = CreateExamFormRef.current.querySelector('#name').value;
+    const examDate = CreateExamFormRef.current.querySelector('#examDate').value;
+    const startH = CreateExamFormRef.current.querySelector('#startH').value;
+    const totalTime = CreateExamFormRef.current.querySelector('#totalTime').value;
+   console.log(name,examDate,startH,totalTime,randomA,randomQ)
+   const res=await axios.post("http://localhost:8000/CreateExam",{
+    name,
+    idL,
+    examDate,
+    startH,
+    totalTime,
+    randomA,
+    randomQ
+  })
+  console.log(res.data)
+  if(res?.data?.success===true){
+    localStorage.setItem("ExamData",JSON.stringify(res?.data?.info))
+    const LecturerDataString = localStorage.getItem('LecturerData');
+    const LecturerData = JSON.parse(LecturerDataString);
+   const fName=LecturerData.firstName
+   setMsgModal(`Dear ${fName} , the exam data has been saved. Please choose which kind of exam you wish to create.`);
+   handleShow()
+  }
 }
   return (
     <div className="container-fluid">
     <center>  <h1>CreateExam</h1>
     <div>
-        <form action="POST" id='exam-form' onSubmit={handleSubmit(submitForm)}>
+        <form action="POST" id='exam-form' ref={CreateExamFormRef} onSubmit={handleSubmit(submitForm)}>
        <input Style="color: Black;background-color: transparent;border-radius: 12px;" id="name" type="text" className="form-control form-control-user"
         name="name"
         placeholder="Enter Exam Name..."{...register('name')}/>
-         <input Style="color: Black;background-color: transparent;border-radius: 12px;" id="id" type="text" className="form-control form-control-user"
-        name="id"
-        placeholder="Enter ID..."{...register('id')}/>
+
          <input Style="color: Black;background-color: transparent;border-radius: 12px;" id="examDate" type="Date" className="form-control form-control-user"
         name="examDate"
         placeholder="Enter Date..."{...register('examDate')}/>
@@ -58,25 +87,37 @@ import { useForm } from 'react-hook-form';
          <label>
         <input
           type="checkbox"
-          checked={isRandomQ}
-          onChange={handleRandomQ}
+          checked={randomQ}
+          onChange={handlerandomQ}
         />
-        RandomQ
+        randomQ
       </label>
       <label>
         <input
           type="checkbox"
-          checked={isRandomA}
-          onChange={handleRandomA}
+          checked={randomA}
+          onChange={handlerandomA}
         />
-        RandomA
+        randomA
       </label>
-      <input type='submit' onClick={submitForm} className='doneBtn' value='Done'/>
+      <input type='submit' className='doneBtn' value='Done'/>
         </form>
     </div>
         <p>
             To continue please choose what kind of exam you wish to create?
         </p>
+        <div><Modal show={showModal} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title className='msg-modal-title'>ALERT!</Modal.Title>
+                </Modal.Header>
+                <Modal.Body><p className='msg-modal'>{msgModal}</p></Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                        Close
+                    </Button>
+                    
+                </Modal.Footer>
+            </Modal></div>
         <div className="row">
             <button onClick={handleClickMultipule}>Multipule Answers</button>
             <button onClick={handleClickOpenQues}>Open Questions</button>
